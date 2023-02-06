@@ -34,9 +34,23 @@ int main()
 	*/
 	std::cout << "Model: " << props.name << std::endl;
 	std::cout << "Compute capability: " << props.major << "." << props.minor << std::endl;
-	std::cout << "Memory: " << props.totalGlobalMem / float(1 << 30) << " GiB" << std::endl;
+	
 	std::cout << "Multiprocessors: " << props.multiProcessorCount << std::endl;
+	
 	std::cout << "Clock rate: " << props.clockRate / float(1'000'000) << " GHz" << std::endl;
-
+	std::cout << "Memory: " << props.totalGlobalMem / float(1 << 30) << " GiB" << std::endl;
+	std::cout << "L2 Cache Size: " << props.l2CacheSize / float(1 << 20)<< " MB" << std::endl;
+	
+	printf("Maximum number of threads per multiprocessor:  %d\n",
+           props.maxThreadsPerMultiProcessor);
+    printf("Maximum number of threads per block:           %d\n",
+           props.maxThreadsPerBlock);
+    printf("Max dimension size of a thread block (x,y,z): (%d, %d, %d)\n",
+           props.maxThreadsDim[0], props.maxThreadsDim[1],
+           props.maxThreadsDim[2]);
+    printf("Max dimension size of a grid size    (x,y,z): (%d, %d, %d)\n",
+           props.maxGridSize[0], props.maxGridSize[1],
+           props.maxGridSize[2]);
+	
 	return 0;
 }
