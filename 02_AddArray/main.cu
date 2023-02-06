@@ -73,3 +73,15 @@ int main(void)
     
     return 0;
 }
+
+/*
+Exercises:
+
+1) Experiment with printf() inside the kernel. 
+Try printing out the values of threadIdx.xand blockIdx.x for some or all of the threads. 
+Do they print in sequential order? Why or why not?
+
+2) Print the value of threadIdx.y or threadIdx.z (or blockIdx.y) in the kernel. 
+(Likewise for blockDim and gridDim). Why do these exist? 
+How do you get them to take on values other than 0 (1 for the dims)?
+*/
