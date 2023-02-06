@@ -10,11 +10,17 @@ void add_0(int n, float *x, float *y)
   int index = blockIdx.x * blockDim.x + threadIdx.x;
   int stride = blockDim.x * gridDim.x;
 
-  for (int i = index; i < n; i += stride)
+  for (int i = index; i < n; i += stride){
     y[i] = x[i] + y[i];
+  }
 }
 
-// Another style for writting kernel function
+/*
+Another style for writting kernel function
+
+Note: This will raise error when total number of
+input vectors are more than number of thread!!
+*/
 __global__
 void add_1(int n, float *x, float *y)
 {
@@ -56,8 +62,9 @@ int main(void)
 
     // Check for errors (all values should be 3.0f)
     float maxError = 0.0f;
-    for (int i = 0; i < N; i++)
+    for (int i = 0; i < N; i++){
         maxError = fmax(maxError, fabs(y[i]-3.0f));
+    }
     std::cout << "Max error: " << maxError << std::endl;
 
     // Free memory
