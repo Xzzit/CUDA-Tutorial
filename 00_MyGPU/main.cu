@@ -51,6 +51,8 @@ int main()
     printf("Max dimension size of a grid size    (x,y,z): (%d, %d, %d)\n",
            props.maxGridSize[0], props.maxGridSize[1],
            props.maxGridSize[2]);
+	printf("Warp size:  %d\n",
+           props.warpSize);
 	
 	return 0;
 }
