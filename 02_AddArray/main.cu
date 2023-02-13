@@ -18,8 +18,10 @@ void add_0(int n, float *x, float *y)
 /*
 Another style for writting kernel function
 
-Note: This will raise error when total number of
-input vectors are more than number of thread!!
+Note: If grids contain many more blocks (numBlocks) than the limit
+of total number of blocks that can be simultaneously executing in a CUDA
+device, the runtime system maintains a list of blocks that need to execute
+and assigns new blocks to SMs when previously assigned blocks complete execution.
 */
 __global__
 void add_1(int n, float *x, float *y)
