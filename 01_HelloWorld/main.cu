@@ -1,9 +1,20 @@
 #include <iostream>
+#include <cooperative_groups.h>
+#include <cooperative_groups/reduce.h>
+namespace cg = cooperative_groups;
 
 __global__ 
 void cuda_hello()
 {
     printf("Hello World from GPU!\n");
+}
+
+__global__
+void cuda_hi()
+{
+    int idx = cg::this_grid().thread_rank();
+    printf("idx: %d\n", idx);
+    printf("Hi from block %d, thread %d\n", blockIdx.x, threadIdx.x);
 }
 
 
@@ -12,7 +23,10 @@ int main()
     printf("Hello World from CPU!\n");
 
     // call a kernel
-    cuda_hello<<<1,1>>>(); 
+    cuda_hello<<<1,1>>>();
+
+    // call a kernel multiple times
+    cuda_hi<<<2,2>>>();
 
     /*
 	 Synchronize with GPU to wait for printf to finish.
