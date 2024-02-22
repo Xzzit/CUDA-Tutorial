@@ -1,5 +1,10 @@
 # CUDA-Tutorial
 
+```
+nvcc main.cu -o main
+```
+
+
 Tested with:
 
 * Ubuntu 22.04
