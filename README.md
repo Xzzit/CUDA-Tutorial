@@ -7,19 +7,7 @@ sudo apt-get install libopencv-dev # OpenCV
 sudo apt-get install libeigen3-dev # Eigen
 ```
 
-## Compile and run the code
-```
-# Chapter 00~02
-nvcc main.cu -o main
-./main
-
-# Chapter 03
-nvcc your_code.cu $(pkg-config --cflags --libs opencv4) -o your_code
-nvcc -I /usr/include/eigen3/ matrixMul.cu -o matrixMul
-./your_code
-```
-
-
+## Hardware and Software Requirements
 Tested with:
 
 * Ubuntu 22.04
