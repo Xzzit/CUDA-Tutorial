@@ -4,7 +4,7 @@
 #include <vector>
 
 #define CHANNEL 3
-#define FILTER_RADIUS 6
+#define FILTER_RADIUS 3
 #define BLOCK_SIZE 16
 #define TILE_SIZE (BLOCK_SIZE + 2 * FILTER_RADIUS)
 
@@ -26,13 +26,6 @@ __global__ void convKernel(
     int Col = bx * blockDim.x + tx;
     int Row = by * blockDim.y + ty;
 
-    if (Col >= width || Row >= height) return;
-
-    int num_pix = 0;
-    int val_b = 0;
-    int val_g = 0;
-    int val_r = 0;
-
     for (int i = 0; i < ceil(float(TILE_SIZE)/BLOCK_SIZE); i++) {
         for (int j = 0; j < ceil(float(TILE_SIZE)/BLOCK_SIZE); j++) {
 
@@ -42,26 +35,35 @@ __global__ void convKernel(
             // Load the tile into shared memory
             if (inRow >= 0 && inRow < height && inCol >= 0 && inCol < width) {
                 for (int k = 0; k < CHANNEL; k++) {
+                    // Be careful with the boundary
+                    if (ty+i*BLOCK_SIZE < TILE_SIZE && tx+j*BLOCK_SIZE < TILE_SIZE)
                     bgr_tile[ty+i*BLOCK_SIZE][tx+j*BLOCK_SIZE][k] = bgr[(inRow * width + inCol) * CHANNEL + k];
                 }
             }
             else {
                 for (int k = 0; k < CHANNEL; k++) {
+                    // Be careful with the boundary
+                    if (ty+i*BLOCK_SIZE < TILE_SIZE && tx+j*BLOCK_SIZE < TILE_SIZE)
                     bgr_tile[ty+i*BLOCK_SIZE][tx+j*BLOCK_SIZE][k] = 0;
                 }
             }
+
             __syncthreads();
         }
     }
 
     // Convolution
+    if (Row >= height || Col >= width) return;
+    int val_b = 0;
+    int val_g = 0;
+    int val_r = 0;
+    int num_pix = 0;
     for (int kRow = 0; kRow < 2 * FILTER_RADIUS + 1; kRow++) {
         for (int kCol = 0; kCol < 2 * FILTER_RADIUS + 1; kCol++) {
             val_b += bgr_tile[ty + kRow][tx + kCol][0] * kernel[kRow][kCol];
             val_g += bgr_tile[ty + kRow][tx + kCol][1] * kernel[kRow][kCol];
             val_r += bgr_tile[ty + kRow][tx + kCol][2] * kernel[kRow][kCol];
             num_pix++;
-            __syncthreads();
         }
     }
 
@@ -90,9 +92,9 @@ int main() {
     }
 
     // Create a gaussian convolutional kernel
-    float kernel_h[(2*FILTER_RADIUS+1)][(2*FILTER_RADIUS+1)];
     int r = FILTER_RADIUS;
-    float sigma = 10.0;
+    float kernel_h[(2 * r + 1)][(2 * r + 1)];
+    float sigma = 10;
     for (int i = 0; i < 2 * r + 1; ++i) {
         for (int j = 0; j < 2 * r + 1; ++j) {
             kernel_h[i][j] = exp(-((i - r) * (i - r) + (j - r) * (j - r)) / (2 * sigma * sigma));
