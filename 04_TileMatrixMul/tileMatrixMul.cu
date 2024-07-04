@@ -13,7 +13,6 @@ __global__ void tileMatrixMulKernel(
     int tx = threadIdx.x;
     int ty = threadIdx.y;
 
-    // Load the tiles into shared memory
     int Row = by * TILE_WIDTH + ty;
     int Col = bx * TILE_WIDTH + tx;
     float Pvalue = 0;
@@ -31,6 +30,7 @@ __global__ void tileMatrixMulKernel(
                 Nds[ty][tx] = 0.0;
             __syncthreads();
 
+            // Perform tile matrix multiplication
             for (int k = 0; k < TILE_WIDTH; ++k) {
                 Pvalue += Mds[ty][k] * Nds[k][tx];
                 __syncthreads();
