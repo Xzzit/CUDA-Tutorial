@@ -26,6 +26,23 @@ __global__ void convKernel(
             for (int kCol = 0; kCol < 2 * r + 1; kCol++) {
                 int idx = ((Row - r + kRow) * width + (Col - r + kCol)) * CHANNEL;
                 if (idx >= 0 && idx < height * width * CHANNEL) {
+                    /*
+                    Since we move the kernel to __constant__ memory, 
+                    we can ignore the load of the kernel
+                    
+                    bgr: 1 byte
+
+                    Operation/Byte:     6 / 3 = 2 FLOP/B
+                    Max Bandwidth:      448.0 GB/s
+                    GFLOP/s:            448.0 * 2 = 896 GFLOP/s
+                    Max Performance:    15.97 TFLOP/s
+                    Utilization:        5.61%
+
+                    We double the performance by moving the kernel to __constant__ memory
+
+                    Constant Mem Restrictions: 64 KB
+                    Constant Mem in Use (r=3): (2 * r + 1) ** 2 * 4 = 196 B
+                    */
                     val_b += bgr[idx] * kernel[kRow][kCol];
                     val_g += bgr[idx + 1] * kernel[kRow][kCol];
                     val_r += bgr[idx + 2] * kernel[kRow][kCol];
@@ -79,7 +96,7 @@ int main() {
     cudaMalloc((void**)&blur_d, size * CHANNEL);
     cudaMalloc((void**)&bgr_d, size * CHANNEL);
     cudaMemcpy(bgr_d, bgr.data(), size * CHANNEL, cudaMemcpyHostToDevice);
-    cudaMemcpyToSymbol(kernel, &kernel_h, (2*FILTER_RADIUS+1)*(2*FILTER_RADIUS+1)*sizeof(float));
+    cudaMemcpyToSymbol(kernel, kernel_h, (2*FILTER_RADIUS+1)*(2*FILTER_RADIUS+1)*sizeof(float));
 
     // Kernel launch
     dim3 grid(ceil(width/16.0), ceil(height/16.0), 1);

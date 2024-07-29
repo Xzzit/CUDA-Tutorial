@@ -24,11 +24,13 @@ __global__ void convKernel(
                 int idx = ((Row - r + kRow) * width + (Col - r + kCol)) * CHANNEL;
                 if (idx >= 0 && idx < height * width * CHANNEL) {
                     /*
-                    Operation/Byte:     6 / 15 = 0.4 OP/B
-                    Bandwidth:          448.0 GB/s
+                    bgr: 1 byte, kernel: 4 bytes
+
+                    Operation/Byte:     6 / 15 = 0.4 FLOP/B
+                    Max Bandwidth:      448.0 GB/s
                     GFLOP/s:            448.0 * 0.4 = 179.2 GFLOP/s
-                    Performance:        15.97 TFLOP/s
-                    Utilization:        1.09%
+                    Max Performance:    15.97 TFLOP/s
+                    Utilization:        1.12%
                     */
                     val_b += bgr[idx] * kernel[kRow * (2 * r + 1) + kCol];
                     val_g += bgr[idx + 1] * kernel[kRow * (2 * r + 1) + kCol];
